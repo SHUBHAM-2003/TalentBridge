@@ -1,8 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { toast } from 'react-hot-toast'
-import api from '@/services/api'
+import toast from 'react-hot-toast'
 
 export default function AdminSettings() {
   return (
@@ -14,10 +13,6 @@ export default function AdminSettings() {
             <div><label className="text-sm font-medium">Platform Name</label><Input defaultValue="TalentBridge" className="mt-1" /></div>
             <div><label className="text-sm font-medium">Contact Email</label><Input type="email" defaultValue="admin@talentbridge.com" className="mt-1" /></div>
             <Button onClick={() => toast.success('Settings saved')}>Save Settings</Button>
-          </CardContent></Card>
-        <Card><CardHeader><CardTitle>Email Templates</CardTitle></CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-gray-500 text-sm">Email templates for notifications (coming soon)</p>
           </CardContent></Card>
         <Card><CardHeader><CardTitle>Change Password</CardTitle></CardHeader>
           <CardContent className="space-y-4">

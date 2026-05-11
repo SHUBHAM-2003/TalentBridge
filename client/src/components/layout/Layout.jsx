@@ -1,13 +1,11 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import { useState } from 'react'
 import { useAuthStore } from '@/store/authStore'
-import { useNotificationStore } from '@/store/notificationStore'
-import { Menu, X, Bell, User, LogOut, Briefcase, Home, Users, FileText, Settings } from 'lucide-react'
+import { Menu, X, User, LogOut, Briefcase, Home, Users, FileText, Settings } from 'lucide-react'
 import { cn } from '@/utils/utils'
 
 export default function Layout() {
   const { user, isAuthenticated, logout } = useAuthStore()
-  const { unreadCount } = useNotificationStore()
   const [mobileOpen, setMobileOpen] = useState(false)
   const isAdmin = user?.role === 'ADMIN'
 
@@ -41,17 +39,9 @@ export default function Layout() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            {isAuthenticated && (
-              <button className="relative p-2 hover:bg-gray-100 rounded-lg">
-                <Bell className="h-5 w-5" />
-                {unreadCount > 0 && <span className="absolute -top-1 -right-1 h-5 w-5 bg-error text-white text-xs rounded-full flex items-center justify-center">{unreadCount}</span>}
-              </button>
-            )}
             {isAuthenticated ? (
               <div className="flex items-center gap-2">
-                <NavLink to={isAdmin ? '/admin' : '/dashboard'} className="text-sm font-medium text-gray-600 hover:text-primary">
-                  {user?.profile?.fullName || user?.email}
-                </NavLink>
+                <NavLink to={isAdmin ? '/admin' : '/dashboard'} className="text-sm font-medium text-gray-600 hover:text-primary">{user?.fullName || user?.email}</NavLink>
                 <button onClick={logout} className="p-2 hover:bg-gray-100 rounded-lg" title="Logout"><LogOut className="h-5 w-5" /></button>
               </div>
             ) : (
@@ -87,21 +77,19 @@ export default function Layout() {
         <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <h4 className="font-heading font-bold text-xl mb-4">TalentBridge</h4>
-            <p className="text-gray-400 text-sm">Connecting talent with opportunity. Find your dream job or the perfect candidate.</p>
+            <p className="text-gray-400 text-sm">Connecting talent with opportunity.</p>
           </div>
           <div>
             <h5 className="font-semibold mb-4">For Candidates</h5>
             <ul className="space-y-2 text-sm text-gray-400">
               <li><NavLink to="/jobs" className="hover:text-white">Browse Jobs</NavLink></li>
               <li><NavLink to="/companies" className="hover:text-white">Companies</NavLink></li>
-              <li><NavLink to="/register" className="hover:text-white">Create Profile</NavLink></li>
             </ul>
           </div>
           <div>
             <h5 className="font-semibold mb-4">Resources</h5>
             <ul className="space-y-2 text-sm text-gray-400">
               <li><a href="#" className="hover:text-white">Career Tips</a></li>
-              <li><a href="#" className="hover:text-white">Salary Guide</a></li>
               <li><a href="#" className="hover:text-white">Contact Us</a></li>
             </ul>
           </div>
@@ -110,7 +98,6 @@ export default function Layout() {
             <ul className="space-y-2 text-sm text-gray-400">
               <li><a href="#" className="hover:text-white">Privacy Policy</a></li>
               <li><a href="#" className="hover:text-white">Terms of Service</a></li>
-              <li><a href="#" className="hover:text-white">Cookie Policy</a></li>
             </ul>
           </div>
         </div>

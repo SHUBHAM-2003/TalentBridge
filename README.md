@@ -1,17 +1,20 @@
-# TalentBridge - Recruitment Platform Demo
+# TalentBridge - Recruitment Platform
 
-A front-end demo showcasing a recruitment marketplace connecting companies and job candidates.
+A fully self-contained recruitment platform demo. All data is stored in browser's localStorage - no database, no server, no Docker.
 
 ## Tech Stack
 
 - **Frontend**: React + TailwindCSS + React Router v6 + Zustand
-- **Demo Mode**: Static mock data (no backend required)
+- **Storage**: Browser localStorage (no backend required)
 
 ## Features
 
-- Public job listings with advanced filters
-- Company profiles
-- Modern responsive UI
+- Browse jobs and companies (public)
+- User registration and login
+- Candidate dashboard with profile, applications
+- Admin dashboard with job management
+- Apply for jobs (saved to localStorage)
+- All data persists in browser
 
 ## Quick Start
 
@@ -23,23 +26,17 @@ npm run dev
 
 Access at: http://localhost:5173
 
-## Project Structure
+## Demo Login
 
-```
-├── client/                   # React frontend
-│   ├── src/
-│   │   ├── pages/
-│   │   ├── components/
-│   │   ├── services/mockData.js  # Demo data
-│   │   └── store/
-├── .gitignore
-└── README.md
-```
+- **Admin**: admin@talentbridge.com / Admin@123
+- **Candidate**: Register any email to login
 
-## Deployment
+## Deploy
 
-This demo deploys to Vercel. Connect your GitHub repo at https://vercel.com/new
+Simply deploy the `client/` folder to Vercel, Netlify, or any static host.
 
 ## Note
 
-This is a demo-only version with static mock data. No database or API required.
+- All data stored in localStorage (clears on browser data wipe)
+- No real backend - purely frontend demo
+- Perfect for demos and prototypes

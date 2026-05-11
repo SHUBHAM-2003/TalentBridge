@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Search, MapPin, Briefcase, Users, CheckCircle, ArrowRight, Building2, Zap, Shield } from 'lucide-react'
-import api from '@/services/api'
+import { getStats, getFeaturedJobs } from '@/services/storage'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { formatSalary } from '@/utils/helpers'
@@ -14,17 +14,8 @@ export default function Landing() {
   const [searchCity, setSearchCity] = useState('')
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [jobsRes, jobsFeaturedRes] = await Promise.all([
-          api.get('/jobs?status=ACTIVE'),
-          api.get('/jobs/featured')
-        ])
-        setStats({ jobs: jobsRes.data.data.total, companies: 8, candidates: 10 })
-        setFeaturedJobs(jobsFeaturedRes.data.data.jobs || [])
-      } catch (e) { console.error(e) }
-    }
-    fetchData()
+    setStats(getStats())
+    setFeaturedJobs(getFeaturedJobs())
   }, [])
 
   const handleSearch = (e) => {

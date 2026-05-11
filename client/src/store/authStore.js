@@ -1,37 +1,20 @@
 import { create } from 'zustand'
 
-export const useAuthStore = create((set, get) => ({
-  user: null, accessToken: null, isAuthenticated: false, loading: false,
-  setUser: (user) => set({ user, isAuthenticated: !!user }),
-  setToken: (token) => set({ accessToken: token }),
-  login: async (email, password) => {
-    set({ loading: true })
-    try {
-      const { default: api } = await import('../services/api')
-      const { data } = await api.post('/auth/login', { email, password })
-      set({ user: data.data.user, accessToken: data.data.accessToken, isAuthenticated: true, loading: false })
-      api.defaults.headers.common['Authorization'] = `Bearer ${data.data.accessToken}`
-      return data
-    } catch (error) {
-      set({ loading: false })
-      throw error
-    }
+const getStoredUser = () => {
+  const stored = localStorage.getItem('talentbridge_session')
+  return stored ? JSON.parse(stored) : null
+}
+
+export const useAuthStore = create((set) => ({
+  user: getStoredUser(),
+  isAuthenticated: !!getStoredUser(),
+  login: (user) => {
+    localStorage.setItem('talentbridge_session', JSON.stringify(user))
+    set({ user, isAuthenticated: true })
   },
-  logout: async () => {
-    try {
-      const { default: api } = await import('../services/api')
-      await api.post('/auth/logout')
-    } catch {}
-    set({ user: null, accessToken: null, isAuthenticated: false })
-    delete api.defaults.headers.common['Authorization']
+  logout: () => {
+    localStorage.removeItem('talentbridge_session')
+    set({ user: null, isAuthenticated: false })
     window.location.href = '/'
-  },
-  checkAuth: async () => {
-    try {
-      const { default: api } = await import('../services/api')
-      const { data } = await api.get('/auth/me')
-      set({ user: data.data.user, isAuthenticated: true })
-      return data.data.user
-    } catch { set({ user: null, isAuthenticated: false }); return null }
   }
 }))

@@ -7,8 +7,6 @@ import Companies from './pages/public/Companies'
 import CompanyDetail from './pages/public/CompanyDetail'
 import Login from './pages/auth/Login'
 import Register from './pages/auth/Register'
-import ForgotPassword from './pages/auth/ForgotPassword'
-import ResetPassword from './pages/auth/ResetPassword'
 import CandidateDashboard from './pages/candidate/Dashboard'
 import CandidateProfile from './pages/candidate/Profile'
 import CandidateApplications from './pages/candidate/Applications'
@@ -25,8 +23,6 @@ import ProtectedRoute from './components/shared/ProtectedRoute'
 import { useAuthStore } from './store/authStore'
 
 export default function App() {
-  const { user } = useAuthStore()
-  
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
@@ -37,8 +33,6 @@ export default function App() {
         <Route path="companies/:id" element={<CompanyDetail />} />
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
-        <Route path="forgot-password" element={<ForgotPassword />} />
-        <Route path="reset-password/:token" element={<ResetPassword />} />
         <Route path="dashboard/*" element={
           <ProtectedRoute roles={['CANDIDATE']}>
             <Routes>
