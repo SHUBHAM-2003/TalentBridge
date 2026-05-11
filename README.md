@@ -19,7 +19,6 @@ A fully self-contained recruitment platform demo. All data is stored in browser'
 ## Quick Start
 
 ```bash
-cd client
 npm install
 npm run dev
 ```
@@ -31,9 +30,12 @@ Access at: http://localhost:5173
 - **Admin**: admin@talentbridge.com / Admin@123
 - **Candidate**: Register any email to login
 
-## Deploy
+## Deploy to Vercel
 
-Simply deploy the `client/` folder to Vercel, Netlify, or any static host.
+1. Go to https://vercel.com/new
+2. Import this GitHub repo
+3. Click **Deploy** (auto-detects Vite)
+4. Done!
 
 ## Note
 
