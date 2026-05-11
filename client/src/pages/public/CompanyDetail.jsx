@@ -1,20 +1,14 @@
-import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { Globe, MapPin, ExternalLink, Briefcase } from 'lucide-react'
-import api from '@/services/api'
+import { Globe, MapPin, Briefcase } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
+import { COMPANIES, getCompanyJobs } from '@/services/mockData'
 import { formatDate } from '@/utils/helpers'
 
 export default function CompanyDetail() {
   const { id } = useParams()
-  const [company, setCompany] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const company = COMPANIES.find(c => c.id === id)
+  const jobs = getCompanyJobs(id)
 
-  useEffect(() => {
-    api.get(`/companies/${id}`).then(r => setCompany(r.data.data.company)).catch(e => console.error(e)).finally(() => setLoading(false))
-  }, [id])
-
-  if (loading) return <div className="max-w-7xl mx-auto px-4 py-8"><div className="animate-pulse h-32 bg-gray-200 rounded"></div></div>
   if (!company) return <div className="max-w-7xl mx-auto px-4 py-8 text-center"><h2 className="text-2xl font-bold">Company not found</h2></div>
 
   return (
@@ -33,20 +27,17 @@ export default function CompanyDetail() {
         </div>
         {company.description && <div className="mt-6 text-gray-600">{company.description}</div>}
       </div>
-      <h2 className="text-xl font-bold mb-6">Open Positions ({company.jobs?.length || 0})</h2>
-      {company.jobs?.length === 0 ? <div className="text-center py-12 text-gray-500">No open positions</div>
+      <h2 className="text-xl font-bold mb-6">Open Positions ({jobs.length})</h2>
+      {jobs.length === 0 ? <div className="text-center py-12 text-gray-500">No open positions</div>
        : <div className="grid md:grid-cols-2 gap-6">
-          {company.jobs.map(job => (
+          {jobs.map(job => (
             <Link key={job.id} to={`/jobs/${job.id}`}><Card className="hover:shadow-lg"><CardContent className="p-6">
               <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="font-semibold text-lg">{job.title}</h3>
-                  <p className="text-sm text-gray-500">{job.location}</p>
-                </div>
+                <div><h3 className="font-semibold text-lg">{job.title}</h3><p className="text-sm text-gray-500">{job.location}</p></div>
                 <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded text-xs">{job.jobType.replace('_', ' ')}</span>
               </div>
               <div className="flex items-center gap-4 mt-4 text-sm text-gray-500">
-                <span className="flex items-center gap-1"><Briefcase className="h-4 w-4" />{job._count?.applications || 0} applicants</span>
+                <span className="flex items-center gap-1"><Briefcase className="h-4 w-4" />{job.location}</span>
                 <span>Posted {formatDate(job.createdAt)}</span>
               </div>
             </CardContent></Card></Link>

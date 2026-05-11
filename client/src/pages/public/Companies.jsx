@@ -1,30 +1,20 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Search, MapPin } from 'lucide-react'
-import api from '@/services/api'
 import { Card, CardContent } from '@/components/ui/card'
-import { SkeletonCard } from '@/components/ui/skeleton'
 import { INDUSTRIES } from '@/constants/options'
+import { getCompanies } from '@/services/mockData'
 
 export default function Companies() {
-  const [companies, setCompanies] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [companies, setCompanies] = useState(getCompanies())
   const [search, setSearch] = useState('')
   const [industry, setIndustry] = useState('')
 
-  useEffect(() => {
-    const fetch = async () => {
-      try {
-        const params = new URLSearchParams()
-        if (search) params.set('search', search)
-        if (industry) params.set('industry', industry)
-        const { data } = await api.get(`/companies?${params}`)
-        setCompanies(data.data.companies || [])
-      } catch (e) { console.error(e) }
-      setLoading(false)
-    }
-    fetch()
-  }, [search, industry])
+  const filtered = companies.filter(c => {
+    if (search && !c.name.toLowerCase().includes(search.toLowerCase())) return false
+    if (industry && c.industry !== industry) return false
+    return true
+  })
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
@@ -39,10 +29,9 @@ export default function Companies() {
           {INDUSTRIES.map(i => <option key={i} value={i}>{i}</option>)}
         </select>
       </div>
-      {loading ? <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">{[...Array(6)].map((_, i) => <SkeletonCard key={i} />)}</div>
-       : companies.length === 0 ? <div className="text-center py-16"><h3 className="text-xl font-semibold">No companies found</h3></div>
+      {filtered.length === 0 ? <div className="text-center py-16"><h3 className="text-xl font-semibold">No companies found</h3></div>
        : <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {companies.map(c => (
+          {filtered.map(c => (
             <Link key={c.id} to={`/companies/${c.id}`}><Card className="hover:shadow-lg transition-shadow"><CardContent className="p-6">
               <div className="flex items-center gap-4 mb-4">
                 <div className="h-14 w-14 rounded-lg bg-gray-100 flex items-center justify-center font-bold text-lg text-gray-500">{c.name?.slice(0, 2).toUpperCase()}</div>
@@ -50,7 +39,6 @@ export default function Companies() {
               </div>
               <div className="flex items-center gap-4 text-sm text-gray-500">
                 {c.city && <span className="flex items-center gap-1"><MapPin className="h-4 w-4" />{c.city}</span>}
-                <span>{c._count?.jobs || 0} open jobs</span>
               </div>
             </CardContent></Card></Link>
           ))}

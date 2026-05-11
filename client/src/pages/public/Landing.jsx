@@ -1,31 +1,17 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Search, MapPin, Briefcase, Users, CheckCircle, ArrowRight, Building2, Zap, Shield } from 'lucide-react'
-import api from '@/services/api'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { formatSalary } from '@/utils/helpers'
+import { getFeaturedJobs, COMPANIES, CANDIDATES } from '@/services/mockData'
 
 export default function Landing() {
   const navigate = useNavigate()
-  const [stats, setStats] = useState({ jobs: 0, companies: 0, candidates: 0 })
-  const [featuredJobs, setFeaturedJobs] = useState([])
   const [searchKeyword, setSearchKeyword] = useState('')
   const [searchCity, setSearchCity] = useState('')
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [jobsRes, jobsFeaturedRes] = await Promise.all([
-          api.get('/jobs?status=ACTIVE'),
-          api.get('/jobs/featured')
-        ])
-        setStats({ jobs: jobsRes.data.data.total, companies: 8, candidates: 10 })
-        setFeaturedJobs(jobsFeaturedRes.data.data.jobs || [])
-      } catch (e) { console.error(e) }
-    }
-    fetchData()
-  }, [])
+  const featuredJobs = getFeaturedJobs()
+  const stats = { jobs: 12, companies: COMPANIES.length, candidates: CANDIDATES.length }
 
   const handleSearch = (e) => {
     e.preventDefault()
@@ -71,28 +57,31 @@ export default function Landing() {
             <Link to="/jobs"><Button variant="ghost" className="text-primary">View All <ArrowRight className="h-4 w-4 ml-1" /></Button></Link>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featuredJobs.map(job => (
-              <Link key={job.id} to={`/jobs/${job.id}`}>
-                <Card className="hover:shadow-lg transition-shadow h-full">
-                  <CardContent className="p-6">
-                    <div className="flex items-start gap-4 mb-4">
-                      <div className="h-12 w-12 rounded-lg bg-gray-100 flex items-center justify-center text-sm font-bold text-gray-500">
-                        {job.company?.name?.slice(0, 2).toUpperCase()}
+            {featuredJobs.map(job => {
+              const company = COMPANIES.find(c => c.id === job.companyId)
+              return (
+                <Link key={job.id} to={`/jobs/${job.id}`}>
+                  <Card className="hover:shadow-lg transition-shadow h-full">
+                    <CardContent className="p-6">
+                      <div className="flex items-start gap-4 mb-4">
+                        <div className="h-12 w-12 rounded-lg bg-gray-100 flex items-center justify-center text-sm font-bold text-gray-500">
+                          {company?.name?.slice(0, 2).toUpperCase()}
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-secondary line-clamp-2">{job.title}</h3>
+                          <p className="text-sm text-gray-500">{company?.name}</p>
+                        </div>
                       </div>
-                      <div>
-                        <h3 className="font-semibold text-secondary line-clamp-2">{job.title}</h3>
-                        <p className="text-sm text-gray-500">{job.company?.name}</p>
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded text-xs">{job.jobType.replace('_', ' ')}</span>
+                        <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs">{job.location}</span>
                       </div>
-                    </div>
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded text-xs">{job.jobType.replace('_', ' ')}</span>
-                      <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs">{job.location}</span>
-                    </div>
-                    <div className="text-lg font-semibold text-primary">{formatSalary(job.salaryMin, job.salaryMax)}</div>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
+                      <div className="text-lg font-semibold text-primary">{formatSalary(job.salaryMin, job.salaryMax)}</div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              )
+            })}
           </div>
         </div>
       </section>
