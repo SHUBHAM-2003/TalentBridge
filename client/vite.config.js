@@ -7,5 +7,5 @@ export default defineConfig({
   resolve: {
     alias: { '@': path.resolve(__dirname, './src') }
   },
-  server: { port: 3000, proxy: { '/api': 'http://localhost:5000' } }
+  base: '/'
 })
