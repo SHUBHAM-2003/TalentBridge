@@ -6,7 +6,7 @@ import { useAuthStore } from '@/store/authStore'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Modal } from '@/components/ui/modal'
-import { formatSalary } from '@/utils/helpers'
+import { formatSalary, isNew } from '@/utils/helpers'
 import toast from 'react-hot-toast'
 
 export default function JobDetail() {

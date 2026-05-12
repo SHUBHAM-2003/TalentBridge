@@ -5,7 +5,7 @@ const getStoredUser = () => {
   return stored ? JSON.parse(stored) : null
 }
 
-export const useAuthStore = create((set) => ({
+export const useAuthStore = create((set, get) => ({
   user: getStoredUser(),
   isAuthenticated: !!getStoredUser(),
   login: (user) => {
@@ -16,5 +16,9 @@ export const useAuthStore = create((set) => ({
     localStorage.removeItem('talentbridge_session')
     set({ user: null, isAuthenticated: false })
     window.location.href = '/'
+  },
+  setUser: (user) => {
+    localStorage.setItem('talentbridge_session', JSON.stringify(user))
+    set({ user })
   }
 }))

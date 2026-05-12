@@ -22,8 +22,13 @@ export default function Profile() {
     e.preventDefault()
     setLoading(true)
     const updated = updateUser(user.id, { ...form, skills })
-    if (updated) { const newUser = { ...user, ...updated }; setUser(newUser); toast.success('Profile updated!') }
-    else toast.error('Failed to update')
+    if (updated) {
+      const newUser = { ...user, ...updated }
+      setUser(newUser)
+      toast.success('Profile updated!')
+    } else {
+      toast.error('Failed to update')
+    }
     setLoading(false)
   }
 
