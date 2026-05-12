@@ -9,10 +9,10 @@ import toast from 'react-hot-toast'
 
 const CATEGORIES = [
   { label: 'Accountant', icon: Calculator }, { label: 'Sales Executive', icon: TrendingUp }, { label: 'Store Manager', icon: Building2 },
-  { label: 'Data Entry', icon: TrendingUpUp }, { label: 'Driver', icon: TrendingUp }, { label: 'Delivery Boy', icon: TrendingUp },
+  { label: 'Data Entry', icon: TrendingUp }, { label: 'Driver', icon: TrendingUp }, { label: 'Delivery Boy', icon: TrendingUp },
   { label: 'Receptionist', icon: Users }, { label: 'Security Guard', icon: Shield }, { label: 'Marketing', icon: TrendingUp },
   { label: 'Customer Support', icon: UserCheck }, { label: 'Teacher', icon: BookOpen }, { label: 'Electrician', icon: Zap },
-  { label: 'Warehouse Staff', icon: Briefcase }, { label: 'IT Support', icon: TrendingUpUp }
+  { label: 'Warehouse Staff', icon: Briefcase }, { label: 'IT Support', icon: TrendingUp }
 ]
 
 const TRENDING_SKILLS = ['Tally', 'MS Excel', 'GST Filing', 'Customer Handling', 'Cash Management', 'Inventory', 'Cold Calling', 'Data Entry', 'Spoken English', 'Delivery Operations']
