@@ -1,19 +1,78 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { Search, MapPin, X, ChevronLeft, ChevronRight, SlidersHorizontal } from 'lucide-react'
+import { Search, MapPin, X, ChevronLeft, ChevronRight, SlidersHorizontal, MessageCircle, Send } from 'lucide-react'
 import { getActiveJobs } from '@/services/storage'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { SkeletonCard } from '@/components/ui/skeleton'
 import { formatSalary, isNew } from '@/utils/helpers'
-import { JOB_TYPES, EXPERIENCE_LEVELS } from '@/constants/options'
+import { JOB_TYPES } from '@/constants/options'
+import toast from 'react-hot-toast'
+
+function NeetaBubble({ onOpen }) {
+  return (
+    <button onClick={onOpen} className="fixed bottom-6 right-6 z-50 h-14 w-14 bg-primary rounded-full shadow-xl flex items-center justify-center hover:bg-primary-600 transition-all hover:scale-110">
+      <div className="absolute inset-0 rounded-full animate-ping bg-primary/30" />
+      <MessageCircle className="h-7 w-7 text-white" />
+    </button>
+  )
+}
+
+function NeetaPanel({ onClose }) {
+  const [input, setInput] = useState('')
+  const [messages, setMessages] = useState([{ text: "Here are the jobs I found for you! Want to refine your search? Tell me more.", from: 'neeta' }])
+  const [typing, setTyping] = useState(false)
+  const inputRef = useRef(null)
+
+  const handleSend = () => {
+    if (!input.trim()) return
+    const userMsg = input
+    setMessages(m => [...m, { text: userMsg, from: 'user' }])
+    setInput('')
+    setTyping(true)
+    setTimeout(() => {
+      setTyping(false)
+      setMessages(m => [...m, { text: "I'm refining your search now! Give me a moment... 😊", from: 'neeta' }])
+      setTimeout(() => {
+        toast.success("Updating job results with your preferences...")
+        onClose()
+      }, 1500)
+    }, 1200)
+  }
+
+  return (
+    <div className="fixed bottom-24 right-6 z-50 w-80 bg-white rounded-2xl shadow-2xl border overflow-hidden">
+      <div className="bg-gradient-to-r from-primary to-blue-600 p-4 flex items-center gap-3">
+        <div className="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center"><span className="text-xl">🤖</span></div>
+        <div><h4 className="font-semibold text-white">NEETA</h4><p className="text-blue-100 text-xs">AI Job Assistant</p></div>
+        <button onClick={onClose} className="ml-auto text-white/80 hover:text-white"><X className="h-5 w-5" /></button>
+      </div>
+      <div className="h-64 overflow-y-auto p-4 space-y-3">
+        {messages.map((m, i) => (
+          <div key={i} className={`flex ${m.from === 'user' ? 'justify-end' : 'justify-start'}`}>
+            <div className={`max-w-[80%] p-3 rounded-lg text-sm ${m.from === 'user' ? 'bg-primary text-white rounded-tr-none' : 'bg-gray-100 text-gray-700 rounded-tl-none'}`}>{m.text}</div>
+          </div>
+        ))}
+        {typing && <div className="flex items-center gap-1"><div className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" /><div className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} /><div className="h-2 w-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }} /></div>}
+      </div>
+      <div className="p-3 border-t flex gap-2">
+        <input ref={inputRef} value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSend()} placeholder="Tell me more about what you want..." className="flex-1 border rounded-lg px-3 py-2 text-sm" />
+        <button onClick={handleSend} className="h-10 w-10 bg-primary text-white rounded-lg flex items-center justify-center hover:bg-primary-600"><Send className="h-4 w-4" /></button>
+      </div>
+    </div>
+  )
+}
 
 export default function Jobs() {
   const [searchParams, setSearchParams] = useSearchParams()
   const [jobs, setJobs] = useState([])
+  const [allJobs, setAllJobs] = useState([])
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
   const [showFilters, setShowFilters] = useState(false)
+  const [showNeeta, setShowNeeta] = useState(false)
+  const [neetaCount, setNeetaCount] = useState(0)
+  const [neetaQuery, setNeetaQuery] = useState('')
   const [filters, setFilters] = useState({
     keyword: searchParams.get('keyword') || '',
     city: searchParams.get('city') || '',
@@ -24,10 +83,25 @@ export default function Jobs() {
   useEffect(() => {
     setLoading(true)
     setTimeout(() => {
-      setJobs(getActiveJobs())
+      const all = getActiveJobs()
+      setAllJobs(all)
+      
+      const matched = searchParams.get('matched')
+      const query = searchParams.get('query')
+      const isNeeta = searchParams.get('neeta') === 'true'
+      
+      if (isNeeta && matched) {
+        const matchedIds = matched.split(',').filter(Boolean)
+        const filtered = all.filter(j => matchedIds.includes(j.id))
+        setJobs(filtered)
+        setNeetaCount(filtered.length)
+        setNeetaQuery(query || '')
+      } else {
+        setJobs(all)
+      }
       setLoading(false)
     }, 300)
-  }, [])
+  }, [searchParams])
 
   const filtered = jobs.filter(job => {
     if (filters.keyword && !job.title.toLowerCase().includes(filters.keyword.toLowerCase())) return false
@@ -50,8 +124,26 @@ export default function Jobs() {
     setPage(1)
   }
 
+  const dismissNeeta = () => {
+    setNeetaCount(0)
+    setJobs(allJobs)
+  }
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
+      {neetaCount > 0 && (
+        <div className="mb-6 p-4 bg-gradient-to-r from-primary/10 to-blue-50 border border-primary/20 rounded-xl flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">🤖</span>
+            <div>
+              <h4 className="font-semibold">NEETA found {neetaCount} jobs matching your profile</h4>
+              {neetaQuery && <p className="text-sm text-gray-500">Searching for: "{neetaQuery}"</p>}
+            </div>
+          </div>
+          <button onClick={dismissNeeta} className="text-sm text-primary hover:underline">Show all jobs</button>
+        </div>
+      )}
+
       <div className="flex flex-col lg:flex-row gap-8">
         <aside className={`lg:w-64 flex-shrink-0 ${showFilters ? 'block' : 'hidden lg:block'}`}>
           <div className="bg-white rounded-xl border p-6 sticky top-24">
@@ -112,7 +204,7 @@ export default function Jobs() {
             <div className="grid md:grid-cols-2 gap-6">
               {paginated.map(job => (
                 <Link key={job.id} to={`/jobs/${job.id}`}>
-                  <Card className="hover:shadow-lg transition-shadow h-full">
+                  <Card className="hover:shadow-xl transition-all duration-300 hover:-translate-y-1 h-full border-l-4 border-l-primary">
                     <CardContent className="p-6">
                       <div className="flex items-start gap-4 mb-4">
                         <div className="h-14 w-14 rounded-lg bg-gray-100 flex items-center justify-center font-bold text-gray-500">
@@ -149,6 +241,9 @@ export default function Jobs() {
           )}
         </div>
       </div>
+
+      <NeetaBubble onOpen={() => setShowNeeta(true)} />
+      {showNeeta && <NeetaPanel onClose={() => setShowNeeta(false)} />}
     </div>
   )
 }
